@@ -143,9 +143,9 @@ bool findBracket(double &xLow, double &xHigh, double a);
 ### **Resultados (Exemplo)**
 | Método          | Raiz \(d\)   | Iterações | Explosão |
 |-----------------|--------------|-----------|----------|
-| Bissecção       | -------      | --        | ---      |
-| Posição Falsa   | -------      | -         | ---      |
-| Newton-Raphson  | -------      | -         | ---      |
+| Bissecção       | 2.718277     | 16        | Sim      |
+| Posição Falsa   | 2.718277     | 4         | Sim      |
+| Newton-Raphson  | 2.718282     | 4         | Sim      |
 
 ---
 
@@ -157,15 +157,15 @@ bool findBracket(double &xLow, double &xHigh, double a);
 ### **Quadro Resumo:**
 | \(a\)  | Método          | Raiz \(d\)   | Iterações | Explosão |
 |--------|-----------------|--------------|-----------|----------|
-| 0.5    | Bissecção       | -------      | ---       | ----     |
-| 0.5    | Posição Falsa   | -------      | -         | ---      |
-| 0.5    | Newton-Raphson  | -------      | -         | ---      |
-| 1.0    | Bissecção       | -------      | --        | ---      |
-| 1.0    | Posição Falsa   | -------      | -         | ---      |
-| 1.0    | Newton-Raphson  | -------      | -         | ---      |
-| 2.0    | Bissecção       | -------      | --        | ---      |
-| 2.0    | Posição Falsa   | -------      | --        | ---      |
-| 2.0    | Newton-Raphson  | -------      | -         | ---      |
+| 0.5    | Bissecção       | 1.648712     | 15        | Não      |
+| 0.5    | Posição Falsa   | 1.648715     | 5         | Não      |
+| 0.5    | Newton-Raphson  | 1.648721     | 4         | Não      |
+| 1.0    | Bissecção       | 2.718277     | 16        | Sim      |
+| 1.0    | Posição Falsa   | 2.718277     | 4         | Sim      |
+| 1.0    | Newton-Raphson  | 2.718282     | 4         | Sim      |
+| 2.0    | Bissecção       | 7.389053     | 16        | Sim      |
+| 2.0    | Posição Falsa   | 7.389055     | 4         | Sim      |
+| 2.0    | Newton-Raphson  | 7.389056     | 3         | Sim      |
 
 ---
 

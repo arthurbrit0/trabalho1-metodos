@@ -24,6 +24,20 @@ string doubleToBrazilString(double valor, int precision = 6) {
 }
 
 //------------------------------------------------------------------------------
+// Função que verifica se "explode" (raiz > 2), se é NaN, ou se é <=2.
+string explodeStatus(double root) {
+    if (std::isnan(root)) {
+        return "null";      // não convergiu => null
+    } 
+    else if (root > 2.0) {
+        return "True";
+    } 
+    else {
+        return "False";
+    }
+}
+
+//------------------------------------------------------------------------------
 // Função original: f(d) = a*d - d*ln(d)
 double f(double d, double a) {
     // Garantir que d > 0, pois há ln(d).
@@ -53,7 +67,6 @@ bool findBracket(double &xLow, double &xHigh, double a) {
     const int MAX_EXPANSOES = 50;
 
     if (xLow <= 0) xLow = 1e-3;
-
     if (f(xLow, a) * f(xHigh, a) < 0.0) {
         return true;
     }
@@ -66,7 +79,6 @@ bool findBracket(double &xLow, double &xHigh, double a) {
             xLow /= 2.0;
             if (xLow <= 0) xLow = 1e-3; 
         }
-
         if (f(xLow, a) * f(xHigh, a) < 0.0) {
             return true;
         }
@@ -93,7 +105,6 @@ pair<double,int> bisseccao(double xLow, double xHigh, double a, double eps, int 
         } else {
             xHigh = root;
         }
-
         if (fabs(xHigh - xLow) < eps) break;
     }
     return make_pair(root, iter+1);
@@ -120,7 +131,6 @@ pair<double,int> posicaoFalsa(double xLow, double xHigh, double a, double eps, i
             xLow = root;
             fLow = fRoot;
         }
-
         if (fabs(xHigh - xLow) < eps) break;
     }
     return make_pair(root, iter+1);
@@ -141,7 +151,6 @@ pair<double,int> newtonRaphson(double x0, double a, double eps, int maxIter, boo
         } else {
             fpx = df_analitica(x, a);
         }
-
         if (fabs(fpx) < 1e-14) {
             // Derivada ~ zero, parar
             break;
@@ -153,7 +162,6 @@ pair<double,int> newtonRaphson(double x0, double a, double eps, int maxIter, boo
             x = xNext;
             break;
         }
-
         x = xNext;
         if (x <= 0) {
             // Evita d <= 0
@@ -259,38 +267,68 @@ int main() {
     }
 
     // --------------------------------------------------------------
-    // Impressao no console (para conferência)
+    // Impressão no console (com explode)
+    // Vamos montar 13 colunas no console:
+    // a, (Bissec Raiz, Iter, Exp), (PF Raiz, Iter, Exp),
+    // (NR_An Raiz, Iter, Exp), (NR_Num Raiz, Iter, Exp)
     // --------------------------------------------------------------
     cout << fixed << setprecision(6);
+
     cout << "\nResultados (console):\n";
-    cout << "---------------------------------------------------------------------------------------------\n";
+    // Ajuste a largura conforme desejar
+    cout << "---------------------------------------------------------------------------------------------------------------------------\n";
     cout << setw(10) << "a"
-         << setw(15) << "BissecRaiz"
-         << setw(12) << "BissecIter"
-         << setw(15) << "PosFalsaRaiz"
-         << setw(12) << "PosFalsaIter"
-         << setw(15) << "NR_An_Raiz"
-         << setw(12) << "NR_An_Iter"
-         << setw(15) << "NR_Num_Raiz"
-         << setw(12) << "NR_Num_Iter"
+         << setw(12) << "BissRaiz"
+         << setw(10) << "BissIter"
+         << setw(10) << "BissExp"
+         << setw(12) << "PFRaiz"
+         << setw(10) << "PFIter"
+         << setw(10) << "PFExp"
+         << setw(12) << "NRA_Raiz"
+         << setw(10) << "NRA_Iter"
+         << setw(10) << "NRA_Exp"
+         << setw(12) << "NRN_Raiz"
+         << setw(10) << "NRN_Iter"
+         << setw(10) << "NRN_Exp"
          << endl;
-    cout << "---------------------------------------------------------------------------------------------\n";
+    cout << "---------------------------------------------------------------------------------------------------------------------------\n";
 
     for (int i = 0; i < n; i++) {
-        cout << setw(10) << valoresA[i]
-             << setw(15) << raizBissec[i]
-             << setw(12) << iterBissec[i]
-             << setw(15) << raizPosFalsa[i]
-             << setw(12) << iterPosFalsa[i]
-             << setw(15) << raizNewtonAnalit[i]
-             << setw(12) << iterNewtonAnalit[i]
-             << setw(15) << raizNewtonNumer[i]
-             << setw(12) << iterNewtonNumer[i]
+        double a = valoresA[i];
+        double rB = raizBissec[i];
+        double rF = raizPosFalsa[i];
+        double rNA = raizNewtonAnalit[i];
+        double rNN = raizNewtonNumer[i];
+
+        // Explode? (True, False, null)
+        string eB  = explodeStatus(rB);
+        string eF  = explodeStatus(rF);
+        string eNA = explodeStatus(rNA);
+        string eNN = explodeStatus(rNN);
+
+        cout << setw(10) << a
+             << setw(12) << rB
+             << setw(10) << iterBissec[i]
+             << setw(10) << eB
+             << setw(12) << rF
+             << setw(10) << iterPosFalsa[i]
+             << setw(10) << eF
+             << setw(12) << rNA
+             << setw(10) << iterNewtonAnalit[i]
+             << setw(10) << eNA
+             << setw(12) << rNN
+             << setw(10) << iterNewtonNumer[i]
+             << setw(10) << eNN
              << endl;
     }
 
     // --------------------------------------------------------------
-    // Geração do CSV
+    // Geração do CSV (com explode)
+    // Faremos 13 colunas no CSV:
+    // a, BissecRaiz, BissecIter, BissecExplode,
+    // PosFalsaRaiz, PosFalsaIter, PosFalsaExplode,
+    // NewtonRaizAnalit, NewtonIterAnalit, NewtonExplodeAnalit,
+    // NewtonRaizNum, NewtonIterNum, NewtonExplodeNum
     // --------------------------------------------------------------
     ofstream csvFile("resultado.csv");
     if (!csvFile.is_open()) {
@@ -298,33 +336,45 @@ int main() {
         return 1;
     }
 
-    // Cabeçalho
+    // Cabeçalho (usando ";" para Excel PT-BR)
     csvFile << "a;"
-            << "BissecRaiz;BissecIter;"
-            << "PosFalsaRaiz;PosFalsaIter;"
-            << "NewtonRaizAnalit;NewtonIterAnalit;"
-            << "NewtonRaizNum;NewtonIterNum\n";
+            << "BissecRaiz;BissecIter;BissecExplode;"
+            << "PosFalsaRaiz;PosFalsaIter;PosFalsaExplode;"
+            << "NewtonRaizAnalit;NewtonIterAnalit;NewtonExplodeAnalit;"
+            << "NewtonRaizNum;NewtonIterNum;NewtonExplodeNum\n";
 
-    // Aqui vamos imprimir valores com vírgula como decimal, p/ Excel PT-BR:
+    // Gravando dados no CSV, usando vírgula como decimal
     for (int i = 0; i < n; i++) {
-        // Converte double -> string "pt-BR" => "1,105164"
-        string aStr   = doubleToBrazilString(valoresA[i]);
-        string bRaiz  = doubleToBrazilString(raizBissec[i]);
-        string pfRaiz = doubleToBrazilString(raizPosFalsa[i]);
-        string nRaizA = doubleToBrazilString(raizNewtonAnalit[i]);
-        string nRaizN = doubleToBrazilString(raizNewtonNumer[i]);
+        double a  = valoresA[i];
+        double rB = raizBissec[i];
+        double rF = raizPosFalsa[i];
+        double rNA= raizNewtonAnalit[i];
+        double rNN= raizNewtonNumer[i];
 
-        // Iterações continuam como inteiros
+        // Transforma em string "pt-BR" (ponto -> vírgula)
+        string aStr    = doubleToBrazilString(a);
+        string bRaiz   = doubleToBrazilString(rB);
+        string pfRaiz  = doubleToBrazilString(rF);
+        string nRaizA  = doubleToBrazilString(rNA);
+        string nRaizN  = doubleToBrazilString(rNN);
+
+        // Explode? (True, False, null)
+        string eB  = explodeStatus(rB);
+        string eF  = explodeStatus(rF);
+        string eNA = explodeStatus(rNA);
+        string eNN = explodeStatus(rNN);
+
         int bIter  = iterBissec[i];
         int pfIter = iterPosFalsa[i];
         int nIterA = iterNewtonAnalit[i];
         int nIterN = iterNewtonNumer[i];
 
         csvFile << aStr << ";"
-                << bRaiz << ";" << bIter << ";"
-                << pfRaiz << ";" << pfIter << ";"
-                << nRaizA << ";" << nIterA << ";"
-                << nRaizN << ";" << nIterN << "\n";
+                << bRaiz << ";"   << bIter << ";"   << eB << ";"
+                << pfRaiz << ";" << pfIter << ";"   << eF << ";"
+                << nRaizA << ";" << nIterA << ";"   << eNA << ";"
+                << nRaizN << ";" << nIterN << ";"   << eNN
+                << "\n";
     }
 
     csvFile.close();

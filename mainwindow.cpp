@@ -17,15 +17,20 @@ MainWindow::MainWindow(QWidget *parent)
     ui->r->setChecked(true);
     on_radioAuto_toggled(true); // habilita aStart/passso, desabilita manual
     // Preparar tabela
-    ui->tableWidget->setColumnCount(13);
+    // Vamos ter 14 colunas no total
+    ui->tableWidget->setColumnCount(14);
+
+    // Define o cabeçalho (14 itens)
     QStringList headers;
     headers << "a"
+            << "Isolamento"
             << "BissecRaiz" << "BissecIter" << "BissecExp"
             << "PosFalsaRaiz" << "PosFalsaIter" << "PosFalsaExp"
             << "NR_An_Raiz" << "NR_An_Iter" << "NR_An_Exp"
             << "NR_Num_Raiz" << "NR_Num_Iter" << "NR_Num_Exp";
 
     ui->tableWidget->setHorizontalHeaderLabels(headers);
+
 
 }
 
@@ -99,107 +104,94 @@ void MainWindow::on_btnCalcular_clicked()
     {
         double a = valoresA[i];
 
-        // Tentar isolar
+        // 1) Isolar
         double xLow = 1.0;
         double xHigh = 2.0;
         bool achou = findBracket(xLow, xHigh, a);
 
-        // Variáveis para guardar o resultado de cada método
-        double rBissec    = NAN, rPosFalsa = NAN, rNewtonA = NAN, rNewtonN = NAN;
-        int    itB        = 0,   itF       = 0,   itNA      = 0,   itNN      = 0;
+        // *** NOVO *** Montamos uma string do isolamento
+        QString isoStr;
+        if (!achou) {
+            isoStr = "[N/A, N/A]";
+        } else {
+            isoStr = QString("[%1, %2]")
+            .arg(xLow, 0, 'f', 6)
+                .arg(xHigh, 0, 'f', 6);
+        }
+
+
+        double rBissec = NAN, rPosFalsa = NAN, rNewtonA = NAN, rNewtonN = NAN;
+        int itB = 0, itF = 0, itNA = 0, itNN = 0;
 
         if (achou) {
-            // Bissecao
+            // 2) Métodos Numéricos
             auto [rB, itb] = bisseccao(xLow, xHigh, a, eps, 20);
-            rBissec = rB;
-            itB     = itb;
+            rBissec = rB; itB = itb;
 
-            // PosFalsa
             auto [rF, itf] = posicaoFalsa(xLow, xHigh, a, eps, 20);
-            rPosFalsa = rF;
-            itF       = itf;
+            rPosFalsa = rF; itF = itf;
 
-            // Newton (analitica)
-            double x0 = 0.5 * (xLow + xHigh);
+            double x0 = 0.5*(xLow + xHigh);
             auto [rNA, itna] = newtonRaphson(x0, a, eps, 20, false);
-            rNewtonA = rNA;
-            itNA     = itna;
+            rNewtonA = rNA; itNA = itna;
 
-            // Newton (numerica)
-            x0 = 0.5 * (xLow + xHigh);
+            x0 = 0.5*(xLow + xHigh);
             auto [rNN_, itnn] = newtonRaphson(x0, a, eps, 20, true);
-            rNewtonN = rNN_;
-            itNN     = itnn;
+            rNewtonN = rNN_; itNN = itnn;
         }
 
-        // ---------------------------------------------------------------
-        // Determinar se explode? (True, False, null) para cada método
-        // ---------------------------------------------------------------
-        // Bissec
-        QString explodeBis;
-        if (std::isnan(rBissec)) {
-            explodeBis = "null";      // não convergiu => null
-        } else if (rBissec > 2.0) {
-            explodeBis = "True";
-        } else {
-            explodeBis = "False";
-        }
+        // 3) Calcular se "explode?" => True/False/null
+        auto explodeFn = [&](double raiz) {
+            if (std::isnan(raiz)) return QString("null");
+            else if (raiz > 2.0) return QString("True");
+            else return QString("False");
+        };
 
-        // PosFalsa
-        QString explodePF;
-        if (std::isnan(rPosFalsa)) {
-            explodePF = "null";
-        } else if (rPosFalsa > 2.0) {
-            explodePF = "True";
-        } else {
-            explodePF = "False";
-        }
+        QString expB = explodeFn(rBissec);
+        QString expF = explodeFn(rPosFalsa);
+        QString expNA= explodeFn(rNewtonA);
+        QString expNN= explodeFn(rNewtonN);
 
-        // Newton Analítica
-        QString explodeNA;
-        if (std::isnan(rNewtonA)) {
-            explodeNA = "null";
-        } else if (rNewtonA > 2.0) {
-            explodeNA = "True";
-        } else {
-            explodeNA = "False";
-        }
+        // 4) Preenchendo a tabela (14 colunas)
+        // col 0 -> a
+        ui->tableWidget->setItem(i, 0,
+                                 new QTableWidgetItem(QString::number(a, 'f', 6)));
 
-        // Newton Numérica
-        QString explodeNN;
-        if (std::isnan(rNewtonN)) {
-            explodeNN = "null";
-        } else if (rNewtonN > 2.0) {
-            explodeNN = "True";
-        } else {
-            explodeNN = "False";
-        }
+        // *** NOVO *** col 1 -> isolamento
+        ui->tableWidget->setItem(i, 1,
+                                 new QTableWidgetItem(isoStr));
 
-        // ---------------------------------------------------------------
-        // Preencher a tabela (13 colunas)
-        // ---------------------------------------------------------------
-        // Col. 0: a
-        ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(a, 'f', 6)));
+        // Bissec -> cols 2 (raiz), 3 (iter), 4 (explode)
+        ui->tableWidget->setItem(i, 2,
+                                 new QTableWidgetItem(QString::number(rBissec, 'f', 6)));
+        ui->tableWidget->setItem(i, 3,
+                                 new QTableWidgetItem(QString::number(itB)));
+        ui->tableWidget->setItem(i, 4,
+                                 new QTableWidgetItem(expB));
 
-        // Bissec  -> cols 1 (raiz), 2 (iter), 3 (explode?)
-        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(rBissec, 'f', 6)));
-        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(itB)));
-        ui->tableWidget->setItem(i, 3, new QTableWidgetItem(explodeBis));
+        // PosFalsa -> cols 5,6,7
+        ui->tableWidget->setItem(i, 5,
+                                 new QTableWidgetItem(QString::number(rPosFalsa, 'f', 6)));
+        ui->tableWidget->setItem(i, 6,
+                                 new QTableWidgetItem(QString::number(itF)));
+        ui->tableWidget->setItem(i, 7,
+                                 new QTableWidgetItem(expF));
 
-        // PosFalsa -> cols 4,5,6
-        ui->tableWidget->setItem(i, 4, new QTableWidgetItem(QString::number(rPosFalsa, 'f', 6)));
-        ui->tableWidget->setItem(i, 5, new QTableWidgetItem(QString::number(itF)));
-        ui->tableWidget->setItem(i, 6, new QTableWidgetItem(explodePF));
+        // Newton Analitico -> cols 8,9,10
+        ui->tableWidget->setItem(i, 8,
+                                 new QTableWidgetItem(QString::number(rNewtonA, 'f', 6)));
+        ui->tableWidget->setItem(i, 9,
+                                 new QTableWidgetItem(QString::number(itNA)));
+        ui->tableWidget->setItem(i, 10,
+                                 new QTableWidgetItem(expNA));
 
-        // Newton Analítica -> cols 7,8,9
-        ui->tableWidget->setItem(i, 7, new QTableWidgetItem(QString::number(rNewtonA, 'f', 6)));
-        ui->tableWidget->setItem(i, 8, new QTableWidgetItem(QString::number(itNA)));
-        ui->tableWidget->setItem(i, 9, new QTableWidgetItem(explodeNA));
-
-        // Newton Numérica -> cols 10,11,12
-        ui->tableWidget->setItem(i, 10, new QTableWidgetItem(QString::number(rNewtonN, 'f', 6)));
-        ui->tableWidget->setItem(i, 11, new QTableWidgetItem(QString::number(itNN)));
-        ui->tableWidget->setItem(i, 12, new QTableWidgetItem(explodeNN));
+        // Newton Numerico -> cols 11,12,13
+        ui->tableWidget->setItem(i, 11,
+                                 new QTableWidgetItem(QString::number(rNewtonN, 'f', 6)));
+        ui->tableWidget->setItem(i, 12,
+                                 new QTableWidgetItem(QString::number(itNN)));
+        ui->tableWidget->setItem(i, 13,
+                                 new QTableWidgetItem(expNN));
     }
 
 }

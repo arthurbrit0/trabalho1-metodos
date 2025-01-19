@@ -6,19 +6,35 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1312</width>
-    <height>928</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <widget class="QLineEdit" name="lineEps">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>40</y>
+      <width>113</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>Precisão desejada</string>
+    </property>
+   </widget>
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>210</y>
+      <y>180</y>
       <width>741</width>
       <height>192</height>
      </rect>
@@ -28,7 +44,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>180</y>
+      <y>150</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -41,7 +57,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>410</y>
+      <y>380</y>
       <width>80</width>
       <height>24</height>
      </rect>
@@ -53,37 +69,35 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>12</y>
-      <width>181</width>
-      <height>147</height>
+      <x>31</x>
+      <y>11</y>
+      <width>156</width>
+      <height>27</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
-       <item>
-        <widget class="QSpinBox" name="spinN"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Número de foguetes</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QSpinBox" name="spinN"/>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEps">
+      <widget class="QLabel" name="label">
        <property name="text">
-        <string/>
-       </property>
-       <property name="placeholderText">
-        <string>Precisão desejada</string>
+        <string>Número de foguetes</string>
        </property>
       </widget>
      </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>10</y>
+      <width>166</width>
+      <height>84</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QRadioButton" name="r">
        <property name="text">
@@ -120,7 +134,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1312</width>
+     <width>800</width>
      <height>21</height>
     </rect>
    </property>

@@ -21,26 +21,30 @@ static double df_numerica(double d, double a) {
     return (fPh - fMh) / (2.0*h);
 }
 
-bool findBracket(double &xLow, double &xHigh, double a) {
-    if (xLow <= 0) xLow = 1e-3;
-    const int MAX_EXPAND = 50;
+bool findBracket(double &xLow, double &xHigh, double a)
+{
+    // EXEMPLO: procurar a mudança de sinal apenas nos inteiros de 1 a 100.
 
-    double fLow = f(xLow,a);
-    double fHigh = f(xHigh,a);
-    if (fLow * fHigh < 0.0) return true;
+    int minI = -10000000;
+    int maxI = 100000000;
 
-    for (int i = 0; i < MAX_EXPAND; i++){
-        if (fabs(xLow) < fabs(xHigh)) xHigh *= 2.0;
-        else {
-            xLow /= 2.0;
-            if (xLow <= 0) xLow = 1e-3;
+    for (int i = minI; i < maxI; i++) {
+        double f1 = f(i, a);
+        double f2 = f(i+1, a);
+
+        // Mudança de sinal => bracket encontrado
+        if (f1 * f2 < 0.0) {
+            xLow  = i;       // inteiro i
+            xHigh = i + 1;   // inteiro i+1
+            return true;
         }
-        fLow  = f(xLow,a);
-        fHigh = f(xHigh,a);
-        if (fLow * fHigh < 0.0) return true;
     }
+    // Se chegar aqui, significa que não encontrou mudança de sinal
+    // em nenhum par de inteiros entre minI e maxI.
     return false;
 }
+
+
 
 // Bissecao
 std::pair<double,int> bisseccao(double xLow, double xHigh, double a, double eps, int maxIter){

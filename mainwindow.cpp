@@ -41,20 +41,17 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_radioAuto_toggled(bool checked)
 {
-    // Se "Automático" estiver selecionado, habilitar lineAstart e linePasso
-    // e desabilitar algo que seria "manual". Se "Manual" estiver selecionado,
-    // fazemos o contrário.
+
     ui->lineAstart->setEnabled(checked);
     ui->linePasso->setEnabled(checked);
 
-    // Caso queira, podemos exibir um label: "Você terá que inserir 'n' valores manualmente"
-    // ou algo do tipo. Aqui, simplificando.
+
 }
 
 void MainWindow::on_btnCalcular_clicked()
 {
     // Ler n e epsilon
-    int n = ui->spinN->value();             // se spinBox
+    int n = ui->spinN->value();
     double eps = ui->lineEps->text().toDouble();
 
     if (n <= 0) {
@@ -66,7 +63,7 @@ void MainWindow::on_btnCalcular_clicked()
         return;
     }
 
-    // Prepara um vetor de 'a'
+
     std::vector<double> valoresA(n);
 
     if (ui->r->isChecked()) {
@@ -78,9 +75,7 @@ void MainWindow::on_btnCalcular_clicked()
             valoresA[i] = aStart + i*passo;
         }
     } else {
-        // Manual - aqui está um exemplo simples:
-        // Exibir uma QInputDialog várias vezes, ou criar um loop pedindo ao usuário
-        // Se for algo mais sofisticado, abrir outra janela para inserir todos de uma vez.
+
         for (int i = 0; i < n; i++) {
             bool ok;
             double val = QInputDialog::getDouble(this,
@@ -109,7 +104,7 @@ void MainWindow::on_btnCalcular_clicked()
         double xHigh = 2.0;
         bool achou = findBracket(xLow, xHigh, a);
 
-        // *** NOVO *** Montamos uma string do isolamento
+
         QString isoStr;
         if (!achou) {
             isoStr = "[N/A, N/A]";
@@ -157,7 +152,7 @@ void MainWindow::on_btnCalcular_clicked()
         ui->tableWidget->setItem(i, 0,
                                  new QTableWidgetItem(QString::number(a, 'f', 6)));
 
-        // *** NOVO *** col 1 -> isolamento
+        // col 1 -> isolamento
         ui->tableWidget->setItem(i, 1,
                                  new QTableWidgetItem(isoStr));
 
@@ -226,11 +221,10 @@ void MainWindow::on_btnSalvarCSV_clicked()
     }
 
     QTextStream out(&file);
-    // Se você usa português do Brasil e Excel, pode querer usar ";" como separador
+
     const QChar sep = ';';
 
     // 3) Escrever cabeçalho CSV
-    // Ajustar conforme suas colunas. Exemplo de 13 colunas:
     out << "a" << sep
         << "BissecRaiz" << sep << "BissecIter" << sep << "BissecExplode" << sep
         << "PosFalsaRaiz" << sep << "PosFalsaIter" << sep << "PosFalsaExplode" << sep

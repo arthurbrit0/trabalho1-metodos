@@ -226,6 +226,7 @@ void MainWindow::on_btnSalvarCSV_clicked()
 
     // 3) Escrever cabeçalho CSV
     out << "a" << sep
+        << "Isolamento" << sep
         << "BissecRaiz" << sep << "BissecIter" << sep << "BissecExplode" << sep
         << "PosFalsaRaiz" << sep << "PosFalsaIter" << sep << "PosFalsaExplode" << sep
         << "NR_An_Raiz" << sep << "NR_An_Iter" << sep << "NR_An_Explode" << sep
